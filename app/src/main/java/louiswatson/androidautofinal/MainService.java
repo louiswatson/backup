@@ -71,7 +71,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
     @Override
     public IBinder onBind(Intent arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -149,9 +148,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         public void onReceive(final Context context, final Intent intent) {
 
             if (intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && tm.getCallState() == TelephonyManager.CALL_STATE_IDLE) {
-                Log.d(TAG, "SMS message received");
                 if(inProcess){
-                    Log.d(TAG, "Already in process");
                     return;
                 }
                 else {
@@ -193,7 +190,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                             @Override
                             public void onFinish() {
                                 ss.textReader("", 1, new String[]{contactName, messageincoming});
-                                Log.d(TAG, "SMSReceiver startVoiceRecognition");
                                 startVoiceRecognition();
                                 return;
                             }
@@ -211,14 +207,12 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         private final Object lock = new Object();
 
         public void signal() {
-            Log.d(TAG, "SyncSpeak signalled");
             synchronized (lock) {
                 lock.notify();
             }
         }
 
         public void await() throws InterruptedException {
-            Log.d(TAG, "SyncSpeak awaited");
             synchronized (lock) {
                 lock.wait();
             }
@@ -226,7 +220,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
         public void textReader(String rawinput, final int caseNumber, String[] params) {
             if (myTTSReady) {
-                Log.d(TAG, "Started textReader");
                 final HashMap myHash = new HashMap<String, String>();
                 myHash.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "Android Auto");
 
@@ -252,20 +245,17 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                     try {
                         if(inputNumber == -1){
                             myTTS.speak("Not a recognized command. Please try again.", TextToSpeech.QUEUE_ADD, myHash);
-                            Log.d(TAG, "SyncSpeak awaiting. Not a recognised command. Try again.");
                             await();
                         }
                         if(inputNumber == 0){
                             //Error handling if there is no speech detected
                             myTTS.speak("No speech was detected. Please try again", TextToSpeech.QUEUE_ADD, myHash);
-                            Log.d(TAG, "SyncSpeak awaiting. No speech detected. Please try again");
                             await();
                         }
                         else if(inputNumber == 1){
                             //Letting the user know that they have received a message
                             String contactName = parameters[0];
                             String message = parameters[1];
-                            Log.d(TAG, "SyncSpeak awaiting. Message from...");
                             //Message from (contact name)
                             myTTS.speak("Message from", TextToSpeech.QUEUE_ADD, myHash);
                             await();
@@ -279,13 +269,11 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                             await();
                             //Giving the user options on what to do
                             myTTS.speak("Would you like to Reply, Repeat, or Quit?", TextToSpeech.QUEUE_ADD, myHash);
-                            Log.d(TAG, "SyncSpeak awaiting. Would you like to...");
                             await();
                         }
                         else if(inputNumber == 2){
                             //"Say your reply"
                             myTTS.speak("Say your reply", TextToSpeech.QUEUE_ADD, myHash);
-                            Log.d(TAG, "SyncSpeak awaiting. Say your reply.");
                             await();
                         }
                         else if(inputNumber == 3){
@@ -298,7 +286,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                             myTTS.playSilence(250, TextToSpeech.QUEUE_ADD, myHash);
                             await();
                             myTTS.speak("Would you like to send, try again, or quit?", TextToSpeech.QUEUE_ADD, myHash);
-                            Log.d(TAG, "SyncSpeak awaiting. Would you like to send, try again...");
                             await();
                         }
                         else {
@@ -311,16 +298,13 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
                     }
                 }
-                Log.d(TAG, "textReader finished");
             }
         }
     }
 
     //if voice recognition isn't available
     public void startVoiceRecognition(){
-        Log.d(TAG, "Voice Recognition Started");
         if (!sr.isRecognitionAvailable(this)) {
-            Log.d(TAG, "Voice Recognition Not Available");
             ss.textReader("Voice recognition not available", -5, new String[] {});
         }
         else {
@@ -343,7 +327,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
         @Override
         public void onDone(String uttId) {
-            Log.d(TAG, "TTS onDone reached");
 
             int result = AudioManager.AUDIOFOCUS_REQUEST_FAILED;
 
@@ -414,12 +397,18 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
             //catching words that sound similar to the options given
             if(stateID == 1){
+                //If the speech result is similar to the word 'ply'
+                //Call 'onReply'
                 if (existsInArray("ply", speechResults)){
                     onReply();
                 }
+                //If the speech result is similar to the word 'repeat'
+                //Call 'onRepeat'
                 else if(existsInArray("repeat", speechResults)){
                     onRepeat();
                 }
+                //If the speech result is similar to the word 'quit'
+                //Call 'onQuit'
                 else if(existsInArray("quit", speechResults)){
                     onQuit();
                 }
@@ -456,45 +445,46 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     private void onUnrecognized(String result) {
         Log.d(TAG, "onUnrecognized " + result);
         ss.textReader("", -1, new String[] {});
-        Log.d(TAG, "onUnrecongized startVoiceRecognition");
         startVoiceRecognition();
         return;
     }
 
     private void onReply(){
-        Log.d(TAG, "onReply");
+        //When onReply is called the text reader will read voice results
+        //and input into a new string which will be sent later
         stateID = 2;
         ss.textReader("", 2, new String[] {});
-        Log.d(TAG, "onReply startVoiceRecognition");
         startVoiceRecognition();
         return;
     }
 
     private void onRepeat(){
-        Log.d(TAG, "onRepeat");
         ss.textReader("", 1, new String[]{contactName, messageincoming});
-        Log.d(TAG, "onRepeat startVoiceRecognition");
         startVoiceRecognition();
         return;
     }
 
     private void onSend(){
-        Log.d(TAG, "onSend");
+        //When the onSend method is called it will send the message response
+        //That the driver has created using voice recognition
         sendSMS(messageresponse);
         return;
     }
 
     private void onTryAgain(){
-        Log.d(TAG, "onTryAgain");
+        //Try again will be used if the driver wants to do the reply again
+        //If the onTryAgain method is called it will listen for voice reply
+        //and insert the response into a new message
         stateID = 2;
         ss.textReader("", 2, new String[] {});
-        Log.d(TAG, "onTryAgain startVoiceRecognition");
         startVoiceRecognition();
         return;
     }
 
     private void onQuit(){
-        Log.d(TAG, "onQuit");
+        //On Quit will be used if the driver doesn't want to do anything with the text
+        //All fields will be cleared and ready for any new messages received.
+        //clearfields is called which will set all the used variables back to 0
         clearFields();
         return;
     }
@@ -503,12 +493,10 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         Log.d(TAG, "onSpeechError " + error);
         sr.cancel();
         if(error == 7) {
-            Log.d(TAG, "onSpeechError startVoiceRecognition");
             startVoiceRecognition();
         }
         else {
             ss.textReader("", 0, new String[] {});
-            Log.d(TAG, "onSpeechError startVoiceRecognition");
             startVoiceRecognition();
         }
         return;
@@ -519,7 +507,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         stateID = 3;
         messageresponse = result;
         ss.textReader("", 3, new String[]{result});
-        Log.d(TAG, "onSpeechResult startVoiceRecognition");
         startVoiceRecognition();
         return;
     }
@@ -550,7 +537,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phonenumber, null, message, null, null);
 
-        //Prompts the user saying that the message has been sent successfully
         ss.textReader("Sent Successfully", -5, new String[]{});
         //clear fields once message has been sent
         clearFields();
