@@ -20,9 +20,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,20 +50,16 @@ public class MainActivity extends AppCompatActivity {
                 updateViews();
             }
         });
-
-
     }
 
     @Override
     public void onResume() {
-        Log.d(TAG, "onResume");
         super.onResume();
         updateViews();
     }
 
     @Override
     public void onStart() {
-        Log.d(TAG, "onStart");
         super.onStart();
         updateViews();
     }
