@@ -4,6 +4,7 @@ package louiswatson.androidautofinal;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         //checking if service is running to proceed
                 serviceOn = isMyServiceRunning(MainService.class);
         Log.d(TAG, "first onCreate: serviceOn is " + serviceOn);
@@ -38,17 +39,13 @@ public class MainActivity extends AppCompatActivity {
         //On button click, the messaging service is turned on
         button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Log.d(TAG, " Button Pressed!!");
                 if(!serviceOn) {
-                    //'Start' button clicked, a toast is made which says 'Service started'
+                    //'Start' button clicked, startMainService is then called which starts service
                     startMainService();
-                    Toast.makeText(MainActivity.this, R.string.start_service, Toast.LENGTH_SHORT).show();
                 }
                 else {
                     //If 'Stop' button is clicked, the messaging service will be turned off
-                    //A toast is made which says 'Service stopped'
                     stopMainService();
-                    Toast.makeText(MainActivity.this, R.string.stop_service, Toast.LENGTH_SHORT).show();
                 }
                 //Logging that the service is on
                 serviceOn = !serviceOn;
@@ -84,10 +81,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateViews(){
         if(!serviceOn) {
+            //if ServiceOn is called, change the button to the start button
+            //Also change the textview box to say the following
             button.setBackgroundResource(R.drawable.start_button);
             textServiceStatus.setText("Android Auto Messaging is off");
         }
         else {
+            //If else, change the button to stop_button
+            //Also change text to the following
             button.setBackgroundResource(R.drawable.stop_button);
             textServiceStatus.setText("Android Auto Messaging is on");
         }

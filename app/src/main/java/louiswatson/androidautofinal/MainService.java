@@ -38,8 +38,6 @@ import java.util.HashMap;
 
 public class MainService extends Service implements AudioManager.OnAudioFocusChangeListener{
     private static final String TAG = "MainService";
-    private final int MY_DATA_CHECK_CODE = 0;
-    private final int REQ_CODE_SPEECH_INPUT = 100;
     private long SMS_delay = 2000;
     public static final String PREFS_NAME = "SMSCar_Prefs";
     private int MAX_MESSAGE_LENGTH = 350;
@@ -66,7 +64,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     private SpeechRecognizer sr;
     private SyncSpeak ss;
     private Intent ri;
-    private BluetoothManager bm;
     private NotificationManager nm;
 
     @Override
@@ -120,8 +117,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         ri = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         ri.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
         ri.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,1);
-
-        bm = (BluetoothManager)getSystemService(Context.BLUETOOTH_SERVICE);
 
         myApplication.registerReceiver(SMScatcher, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
     }
@@ -327,8 +322,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
         @Override
         public void onDone(String uttId) {
-
-            int result = AudioManager.AUDIOFOCUS_REQUEST_FAILED;
 
             if (!clearedTTS) {
                 // clearTts();
@@ -557,9 +550,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
             am.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume[1], 0);
         }
         am.abandonAudioFocus(MainService.this);
-
-        am.stopBluetoothSco();
-        am.setBluetoothScoOn(false);
         am.setMode(AudioManager.MODE_NORMAL);
     }
 

@@ -12,7 +12,6 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive");
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean servicestart = preferences.getBoolean("pref_key_servicestart_preference", false);
         Log.d(TAG, "servicestart preference is: " + servicestart);
