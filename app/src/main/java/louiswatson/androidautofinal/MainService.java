@@ -39,7 +39,6 @@ import java.util.HashMap;
 public class MainService extends Service implements AudioManager.OnAudioFocusChangeListener{
     private static final String TAG = "MainService";
     private long SMS_delay = 2000;
-    public static final String PREFS_NAME = "SMSCar_Prefs";
     private int MAX_MESSAGE_LENGTH = 350;
     private int[] originalVolume;
 
@@ -324,7 +323,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         public void onDone(String uttId) {
 
             if (!clearedTTS) {
-                // clearTts();
                 Intent c = new Intent();
                 c.setAction("MainService.CLEAR");
                 myApplication.sendBroadcast(c);
@@ -349,15 +347,15 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         private static final String TAG = "SpeechListener";
 
         public void onBeginningOfSpeech() {
-            Log.d(TAG, "onBeginningOfSpeech");
+
         }
 
         public void onBufferReceived(byte[] buffer) {
-            Log.d(TAG, "onBufferReceived");
+
         }
 
         public void onEndOfSpeech() {
-            Log.d(TAG, "onEndOfSpeech");
+            ;
         }
 
         public void onError(int error) {
@@ -365,16 +363,14 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
             onSpeechError(error);
         }
 
-        public void onEvent(int eventType, Bundle params) {
-            Log.d(TAG, "onEvent");
+        public void onEvent(int eventType, Bundle params) {;
         }
 
-        public void onPartialResults(Bundle partialResults) {
-            Log.d(TAG, "onPartialResults");
+        public void onPartialResults(Bundle partialResults) {;
         }
 
         public void onReadyForSpeech(Bundle params) {
-            Log.d(TAG, "onReadyForSpeech");
+            ;
         }
 
         public void onResults(Bundle results) {
