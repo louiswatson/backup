@@ -66,6 +66,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     private NotificationManager nm;
 
     @Override
+    #Return communication channel to the service
     public IBinder onBind(Intent arg0) {
         return null;
     }
@@ -82,6 +83,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     }
 
     @Override
+    #Called by system when first created
     public void onCreate() {
         myApplication = this.getApplication();
 
