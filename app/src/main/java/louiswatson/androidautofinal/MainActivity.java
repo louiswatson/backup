@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     private static boolean serviceOn;
@@ -30,24 +29,23 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "first onCreate: serviceOn is " + serviceOn);
         button = (Button)findViewById(R.id.button);
         textServiceStatus = (TextView)findViewById(R.id.serviceStatus);
-
-        updateViews();
+        updateInfo();
 
         //On button click, the messaging service is turned on
         button.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 if(!serviceOn) {
-                    //'Start' button clicked, startMainService is then called which starts service
+                    //if service isn't on, call startMainService which will begin service
                     startMainService();
                 }
                 else {
-                    //If 'Stop' button is clicked, the messaging service will be turned off
+                    //If service is on, then stop service
                     stopMainService();
                 }
                 //Logging that the service is on
                 serviceOn = !serviceOn;
                 Log.d(TAG, "serviceOn is " + serviceOn);
-                updateViews();
+                updateInfo();
             }
         });
     }
@@ -55,13 +53,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        updateViews();
+        updateInfo();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        updateViews();
+        updateInfo();
     }
 
     private void startMainService(){
@@ -72,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         stopService(new Intent(this, MainService.class));
     }
 
-    private void updateViews(){
+    private void updateInfo(){
         if(!serviceOn) {
             //if ServiceOn is called, change the button to the start button
             //Also change the textview box to say the following

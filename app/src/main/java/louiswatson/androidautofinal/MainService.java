@@ -47,7 +47,6 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     private static boolean inProcess = false;
     private static String phonenumber = "";
     private static int stateID = 0;
-    private static int audiostate = 0;
     private static String messageresponse = "";
     private static String messageincoming = "";
     private static String contactName = "";
@@ -170,8 +169,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                         stateID = 1;
 
 
-
-                        audiostate = 0;
+                        
                         originalVolume = new int[2];
                         originalVolume[0] = am.getStreamVolume(AudioManager.STREAM_VOICE_CALL);
                         originalVolume[1] = am.getStreamVolume(AudioManager.STREAM_MUSIC);
