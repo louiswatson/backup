@@ -65,7 +65,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     private NotificationManager nm;
 
     @Override
-    #Return communication channel to the service
+    //Return communication channel to the service
     public IBinder onBind(Intent arg0) {
         return null;
     }
@@ -82,7 +82,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     }
 
     @Override
-    #Called by system when first created
+    //Called by system when first created
     public void onCreate() {
         myApplication = this.getApplication();
 
@@ -136,7 +136,8 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         super.onDestroy();
     }
 
-    //Text message received
+    //Broadcast receiver code
+    //If the action equals 'SMS_Received' this means that a text has been received
     private final BroadcastReceiver SMScatcher = new BroadcastReceiver() {
 
         @Override
@@ -169,7 +170,8 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                         stateID = 1;
 
 
-                        
+                        //Changing volume if text has been received
+                        //Means that message wont be missed if volume is low
                         originalVolume = new int[2];
                         originalVolume[0] = am.getStreamVolume(AudioManager.STREAM_VOICE_CALL);
                         originalVolume[1] = am.getStreamVolume(AudioManager.STREAM_MUSIC);
