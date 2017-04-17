@@ -1,12 +1,11 @@
 package louiswatson.androidautofinal;
 
-
+//imports needed
 import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -99,6 +98,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
                     .setContentIntent(contentIntent)
                     .setContentTitle("Android Auto Text Messaging")
+                    //Set textview to say the following
                     .setContentText("Android Messaging is Currently On")
                     .setPriority(Notification.PRIORITY_LOW).build();
             nm.notify(1, mNotification);
@@ -111,13 +111,14 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
         ss = new SyncSpeak();
 
+        //Creating the speech recogniser and listener
         sr = SpeechRecognizer.createSpeechRecognizer(this);
         sr.setRecognitionListener(new SpeechListener());
 
         ri = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         ri.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
         ri.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS,1);
-
+        //Register receiver to SMS_Received, broadcast receiver will recognise if a text has come in
         myApplication.registerReceiver(SMScatcher, new IntentFilter("android.provider.Telephony.SMS_RECEIVED"));
     }
 
@@ -136,8 +137,13 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         super.onDestroy();
     }
 
+
     //Broadcast receiver code
     //If the action equals 'SMS_Received' this means that a text has been received
+
+    //If a text message is received the broadcast receiver will notice.
+    //this will initiate the main function of the app, being able to reply etc
+
     private final BroadcastReceiver SMScatcher = new BroadcastReceiver() {
 
         @Override
@@ -148,6 +154,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                     return;
                 }
                 else {
+                    //If the inProcess is true then start getting contact information, text content information
                     inProcess = true;
                     Bundle bundle = intent.getExtras();
                     if (bundle != null) {
@@ -157,8 +164,10 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                         messageincoming = "";
                         for (int i = 0; i < messages.length; i++) {
                             messages[i] = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
+                            //SMS message from..
                             strMessage += "SMS From: " + messages[i].getOriginatingAddress();
                             strMessage += " : ";
+                            //Getting text message body content
                             strMessage += messages[i].getMessageBody();
                             messageincoming += messages[i].getMessageBody();
                             strMessage += "\n";
@@ -166,12 +175,17 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                             Log.v(TAG, messages[i].getOriginatingAddress() + " " + messages[i].getMessageBody());
                         }
                         messageincoming = messageincoming.trim();
+                        //Get contact name by searching contact book with the phone number
                         contactName = getContactDisplayNameByNumber(phonenumber);
                         stateID = 1;
 
 
+
                         //Changing volume if text has been received
                         //Means that message wont be missed if volume is low
+
+                        //Changing the volume incase the application volume is low, will always be able to hear what the text says then
+
                         originalVolume = new int[2];
                         originalVolume[0] = am.getStreamVolume(AudioManager.STREAM_VOICE_CALL);
                         originalVolume[1] = am.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -240,6 +254,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                     //If a command isn't recognised it will loop back round
                     try {
                         if(inputNumber == -1){
+                            //if the command was't recognised, say this message
                             myTTS.speak("Not a recognized command. Please try again.", TextToSpeech.QUEUE_ADD, myHash);
                             await();
                         }
@@ -255,8 +270,10 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                             //Message from (contact name)
                             myTTS.speak("Message from", TextToSpeech.QUEUE_ADD, myHash);
                             await();
+                            //Reads out the contact name, if the contact name isn't available then read out the mobile number
                             myTTS.speak(contactName, TextToSpeech.QUEUE_ADD, myHash);
                             await();
+                            //Play silence so that the information is being split up
                             myTTS.playSilence(250, TextToSpeech.QUEUE_ADD, myHash);
                             await();
                             myTTS.speak(message, TextToSpeech.QUEUE_ADD, myHash);
@@ -268,7 +285,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                             await();
                         }
                         else if(inputNumber == 2){
-                            //"Say your reply"
+                            //if the driver said 'reply then say "Say your reply" out loud
                             myTTS.speak("Say your reply", TextToSpeech.QUEUE_ADD, myHash);
                             await();
                         }
@@ -277,10 +294,12 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                             //App prompts the user asking if they would like to send the message
                             //Try the message again, or try again
                             String speechInput = parameters[0];
+                            //Text message that the driver created is then read out
                             myTTS.speak(speechInput, TextToSpeech.QUEUE_ADD, myHash);
                             await();
                             myTTS.playSilence(250, TextToSpeech.QUEUE_ADD, myHash);
                             await();
+                            //Message has been created by the driver, driver is prompted with this question
                             myTTS.speak("Would you like to send, try again, or quit?", TextToSpeech.QUEUE_ADD, myHash);
                             await();
                         }
@@ -382,8 +401,9 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
             for (int i = 0; i < data.size(); i++){
                 Log.d(TAG, "result " + data.get(i));
             }
-
+            //Speech results is what the driver said, data put to an array
             String[] speechResults = new String[data.size()];
+            //Speech results checked to see if reply, repeat or quit was said
             speechResults = data.toArray(speechResults);
 
             //catching words that sound similar to the options given
@@ -450,7 +470,9 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     }
 
     private void onRepeat(){
+        //Function for repeating the text message
         ss.textReader("", 1, new String[]{contactName, messageincoming});
+        //Once message is repeated, voice recognition starts up
         startVoiceRecognition();
         return;
     }
@@ -480,6 +502,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         return;
     }
 
+    //Speech error
     private void onSpeechError(int error){
         Log.d(TAG, "onSpeechError " + error);
         sr.cancel();
@@ -501,7 +524,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         startVoiceRecognition();
         return;
     }
-
+    //Function for finding the contacts name by searching contact book with number
     public String getContactDisplayNameByNumber(String number) {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
         String name = "unknown number";
@@ -536,9 +559,13 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     //setting all fields back to nothing
     //so if another message is received it won't have previous information
     private void clearFields(){
+        //Inprocess set back to false
         inProcess = false;
+        //Phone number reset
         phonenumber = "";
+        //stateID reset
         stateID = 0;
+        //Message response reset
         messageresponse = "";
         messageincoming = "";
         contactName = "";

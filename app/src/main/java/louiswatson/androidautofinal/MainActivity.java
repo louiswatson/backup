@@ -61,11 +61,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         updateInfo();
     }
-
+    //if startMainService is called do this
     private void startMainService(){
         startService(new Intent(this, MainService.class));
     }
 
+    //if stopMainService is called, do this
     private void stopMainService(){
         stopService(new Intent(this, MainService.class));
     }
