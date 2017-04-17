@@ -267,7 +267,8 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
                             //Letting the user know that they have received a message
                             String contactName = parameters[0];
                             String message = parameters[1];
-                            //Message from (contact name)
+                            //Message from
+                            //TEXT TO SPEECH
                             myTTS.speak("Message from", TextToSpeech.QUEUE_ADD, myHash);
                             await();
                             //Reads out the contact name, if the contact name isn't available then read out the mobile number
