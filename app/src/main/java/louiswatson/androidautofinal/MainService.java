@@ -104,6 +104,9 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
             nm.notify(1, mNotification);
         }
 
+
+        // http://stackoverflow.com/questions/3058919/text-to-speechtts-android
+
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         myTTS = new TextToSpeech(myApplication, listenerStarted);
         myTTS.setSpeechRate((float) 1);
@@ -148,6 +151,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
+            //http://stackoverflow.com/questions/1973071/broadcastreceiver-sms-received
 
             if (intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED") && tm.getCallState() == TelephonyManager.CALL_STATE_IDLE) {
                 if(inProcess){
@@ -398,6 +402,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
         public void onResults(Bundle results) {
             String str = "";
             Log.d(TAG, "onResults " + results);
+            //https://developer.android.com/reference/android/speech/SpeechRecognizer.html
             ArrayList<String> data = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             for (int i = 0; i < data.size(); i++){
                 Log.d(TAG, "result " + data.get(i));
@@ -479,6 +484,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     }
 
     private void onSend(){
+        //http://stackoverflow.com/questions/4967448/send-sms-in-android
         //When the onSend method is called it will send the message response
         //That the driver has created using voice recognition
         sendSMS(messageresponse);
@@ -527,6 +533,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     }
     //Function for finding the contacts name by searching contact book with number
     public String getContactDisplayNameByNumber(String number) {
+        //http://stackoverflow.com/questions/6587674/android-contacts-display-name-and-phone-numbers-in-single-database-query
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number));
         String name = "unknown number";
 
@@ -550,6 +557,7 @@ public class MainService extends Service implements AudioManager.OnAudioFocusCha
     public void sendSMS(String message){
         Log.d(TAG, "Sending SMS to phonenumber: " + phonenumber);
         SmsManager sms = SmsManager.getDefault();
+        // https://developer.android.com/reference/android/telephony/gsm/SmsManager.html
         sms.sendTextMessage(phonenumber, null, message, null, null);
 
         ss.textReader("Sent Successfully", -5, new String[]{});
